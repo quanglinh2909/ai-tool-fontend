@@ -3,9 +3,9 @@ import { useState } from 'react';
 
 import { SidebarProvider } from '../hooks/useSidebarState';
 import { Order } from '@/types';
-import Sidebar from '@/components/Sidebar';
 import OrderTable from '@/components/OrderTable';
 import Header from '@/components/Header';
+import Sidebar from '@/components/left-menu/Sidebar';
 
 const Home: NextPage = () => {
   // Sample data
@@ -82,7 +82,7 @@ const Home: NextPage = () => {
       <div className="flex h-screen bg-gray-50">
         <Sidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
-          <Header />
+          {/* <Header /> */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
             <OrderTable orders={orders} />
           </main>

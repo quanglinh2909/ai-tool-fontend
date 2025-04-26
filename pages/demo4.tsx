@@ -51,8 +51,14 @@ export default function Home3() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6">Video Stream with Polygon Drawing</h1>
+      <img
+          ref={imgRef}
+          className="rounded-lg shadow-lg"
+          alt="Video Stream"
+          style={{ maxWidth: '100%', height: 'auto' }}
+        />
       
-      <div className="relative mb-6">
+      {/* <div className="relative mb-6">
         <img
           ref={imgRef}
           className="rounded-lg shadow-lg"
@@ -76,7 +82,7 @@ export default function Home3() {
           <h2 className="text-xl font-semibold mb-2">Polygon Coordinates:</h2>
           <p className="break-words">{coordinates}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

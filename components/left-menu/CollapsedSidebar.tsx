@@ -1,49 +1,32 @@
 import { FC } from 'react';
-import { SidebarItem } from '../types';
-import CollapsedSidebar from './CollapsedSidebar';
-import { useSidebarState } from '../hooks/useSidebarState';
+import { SidebarItem } from '@/types';
 
-const sidebarItems: SidebarItem[] = [
-  { name: 'App', icon: 'home', href: '#' },
-  { name: 'Ecommerce', icon: 'shopping-bag', href: '#' },
-  { name: 'Analytics', icon: 'bar-chart-2', href: '#' },
-  { name: 'Banking', icon: 'dollar-sign', href: '#' },
-  { name: 'Booking', icon: 'calendar', href: '#' },
-  { name: 'File', icon: 'file', href: '#' },
-  { name: 'Course', icon: 'book', href: '#' },
-  { name: 'User', icon: 'user', href: '#', badge: 4 },
-  { name: 'Product', icon: 'package', href: '#' },
-];
+interface CollapsedSidebarProps {
+  items: SidebarItem[];
+  activeItem: string;
+}
 
-const Sidebar: FC = () => {
-  const { isCollapsed } = useSidebarState();
-  const activeItem = 'App'; // This could be dynamic based on current page
-
-  if (isCollapsed) {
-    return <CollapsedSidebar items={sidebarItems} activeItem={activeItem} />;
-  }
-
+const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+    <aside className="w-16 bg-white border-r border-gray-200 flex flex-col items-center">
       <div className="p-4">
-        <a href="#" className="flex items-center">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <a href="#" className="flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M16 4L28 12V28H4V12L16 4Z" fill="#4ADE80" />
           </svg>
         </a>
       </div>
       
-      <nav className="flex-1 overflow-y-auto">
-        <div className="px-4 py-2 space-y-1">
-          {sidebarItems.map((item) => (
+      <nav className="flex-1 overflow-y-auto w-full">
+        {items.map((item) => (
+          <div key={item.name} className="relative py-2 flex justify-center">
             <a 
-              key={item.name}
               href={item.href} 
-              className={`flex items-center px-4 py-3 rounded-lg ${
-                activeItem === item.name ? 'bg-gray-100' : 'text-gray-600 hover:bg-gray-50'
+              className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                activeItem === item.name ? 'bg-gray-100' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
-              <div className="flex items-center justify-center w-6 h-6 mr-3">
+              <div className="flex items-center justify-center">
                 {item.name === 'App' && (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -93,23 +76,17 @@ const Sidebar: FC = () => {
                   </svg>
                 )}
               </div>
-              <span>{item.name}</span>
-              {item.badge && (
-                <span className="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-500 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-              {item.name === 'User' || item.name === 'Product' ? (
-                <svg className="ml-auto w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              ) : null}
             </a>
-          ))}
-        </div>
+            {item.badge && (
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+                {item.badge}
+              </span>
+            )}
+          </div>
+        ))}
       </nav>
     </aside>
   );
 };
 
-export default Sidebar;
+export default CollapsedSidebar;
