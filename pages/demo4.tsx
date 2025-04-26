@@ -7,6 +7,8 @@ export default function Home3() {
   const imgRef = useRef<any>(null);
   const [points, setPoints] = useState<{x: number; y: number}[]>([]);
   const [coordinates, setCoordinates] = useState<string>('');
+  const [arrowAngle, setArrowAngle] = useState<number>(0);
+
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8654/ws/video');
@@ -62,13 +64,16 @@ export default function Home3() {
         <PolygonDrawer 
           containerRef={imgRef}
           points={points} 
-          setPoints={setPoints} 
+          setPoints={setPoints}
+          arrowAngle={arrowAngle}
         />
       </div>
 
       <ControlPanel 
         onClear={clearAllPoints} 
-        onGetCoordinates={getCoordinates} 
+        onGetCoordinates={getCoordinates}
+        arrowAngle={arrowAngle}
+        setArrowAngle={setArrowAngle}
       />
 
       {coordinates && (
