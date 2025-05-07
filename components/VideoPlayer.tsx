@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { CameraIcon, ExclamationCircleIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
 import { useCamera } from '../hooks/useCamera';
+import { Loading } from './Loading';
 
 interface VideoPlayerProps {
   onQualityChange?: (quality: 'high' | 'medium' | 'low') => void;
@@ -14,11 +15,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ onQualityChange }) => 
     togglePlay,
     setStreamQuality,
   } = useCamera();
+  const [streamError, setStreamError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('cameraState.isPlaying', cameraState.isPlaying);
     if (!cameraState.isPlaying) return;
-    console.log('cameraState.isPlaying', cameraState.isPlaying);
+    
+    setStreamError(null);
     
     const ws = new WebSocket('ws://localhost:8654/ws/video');
     ws.binaryType = 'arraybuffer';
@@ -32,16 +34,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ onQualityChange }) => 
       }
     };
 
-    ws.onerror = (event) => {
-      console.error('WebSocket error:', event);
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setStreamError('Failed to receive video stream. Please check your connection.');
     };
 
     ws.onclose = () => {
-      console.log('WebSocket closed');
-    };
-
-    ws.onopen = () => {
-      console.log('WebSocket opened');
+      if (cameraState.isPlaying) {
+        setStreamError('Video stream connection closed. Please reconnect.');
+      }
     };
 
     return () => {
@@ -56,25 +57,34 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ onQualityChange }) => 
 
   return (
     <div className="bg-black w-full h-[70%] relative rounded-t-lg flex items-center justify-center">
-      
-      {!cameraState.isConnected ? (
+
+      {cameraState.isLoading ? (
+        <Loading size="large" color="white" text="Connecting to camera..." />
+      ) : !cameraState.isConnected ? (
         <div className="absolute inset-0 flex items-center justify-center text-white">
           <div className="text-center px-4">
             <CameraIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg">Enter camera details and connect</p>
           </div>
         </div>
-      ) : cameraState.error ? (
+      ) : streamError ? (
         <div className="absolute inset-0 flex items-center justify-center text-white bg-black/80">
           <div className="text-center px-4">
             <ExclamationCircleIcon className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <p className="text-lg text-red-300">{cameraState.error}</p>
+            <p className="text-lg text-red-300">{streamError}</p>
             <button 
-              onClick={togglePlay}
+              onClick={() => setStreamError(null)}
               className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm"
             >
               Try Again
             </button>
+          </div>
+        </div>
+      ) : !cameraState.isPlaying ? (
+        <div className="absolute inset-0 flex items-center justify-center text-white bg-black/80">
+          <div className="text-center px-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p className="text-lg">Loading stream...</p>
           </div>
         </div>
       ) : (

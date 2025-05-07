@@ -16,5 +16,12 @@ export interface Order {
     name: string;
     icon: string;
     href: string;
-    badge?: number;
+    badge?: string;
+    submenu?: {
+      name: string;
+      icon: string;
+      href: string;
+      badge?: string;
+    }[];
+    isOpen?: boolean;
   }

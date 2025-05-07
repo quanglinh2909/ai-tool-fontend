@@ -12,6 +12,7 @@ export interface CameraConfig {
 export interface CameraState {
   isConnected: boolean;
   isPlaying: boolean;
+  isLoading: boolean;
   error: string | null;
   streamQuality: 'high' | 'medium' | 'low';
 }
@@ -29,6 +30,7 @@ export const useCamera = () => {
   const [cameraState, setCameraState] = useState<CameraState>({
     isConnected: false,
     isPlaying: false,
+    isLoading: false,
     error: null,
     streamQuality: 'high',
   });
@@ -44,9 +46,9 @@ export const useCamera = () => {
   }, []);
 
   const connectToCamera = useCallback(async () => {
+    setCameraState(prev => ({ ...prev, isLoading: true, error: null }));
+    
     try {
-      setCameraState(prev => ({ ...prev, error: null }));
-      
       // Close existing connection if any
       if (wsConnection) {
         wsConnection.close();
@@ -57,7 +59,7 @@ export const useCamera = () => {
 
       ws.onopen = () => {
         console.log('WebSocket opened');
-        setCameraState(prev => ({ ...prev, isConnected: true ,isPlaying: true}));
+        setCameraState(prev => ({ ...prev, isConnected: true ,isPlaying: true, isLoading: false}));
         setRetryCount(0);
       };
 
@@ -67,6 +69,7 @@ export const useCamera = () => {
           ...prev,
           error: 'Failed to connect to camera. Please check your settings.',
           isConnected: false,
+          isLoading: false,
         }));
       };
 
@@ -81,6 +84,7 @@ export const useCamera = () => {
               error: 'Connection lost. Please try reconnecting.',
               isConnected: false,
               isPlaying: false,
+              isLoading: false,
             }));
           }
         }
@@ -92,6 +96,7 @@ export const useCamera = () => {
         ...prev,
         error: 'Failed to initialize camera connection.',
         isConnected: false,
+        isLoading: false,
       }));
     }
   }, [wsConnection, cameraState.isPlaying, retryCount]);
@@ -105,6 +110,7 @@ export const useCamera = () => {
       isConnected: false,
       isPlaying: false,
       error: null,
+      isLoading: false,
     }));
     setWsConnection(null);
   }, [wsConnection]);
@@ -123,11 +129,8 @@ export const useCamera = () => {
     }));
   }, []);
 
-  const updateCameraConfig = useCallback((config: Partial<CameraConfig>) => {
-    setCameraConfig(prev => ({
-      ...prev,
-      ...config,
-    }));
+  const updateCameraConfig = useCallback((updates: Partial<CameraConfig>) => {
+    setCameraConfig(prev => ({ ...prev, ...updates }));
   }, []);
 
   // Cleanup on unmount

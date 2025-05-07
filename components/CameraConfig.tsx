@@ -1,32 +1,49 @@
 import React from 'react';
-import { CameraConfig as CameraConfigType } from '../hooks/useCamera';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { Loading } from './Loading';
 
-export interface CameraConfigProps {
-  config: CameraConfigType;
+interface CameraConfigProps {
+  config: {
+    name: string;
+    ipAddress: string;
+    port: string;
+    username: string;
+    password: string;
+    channel: string;
+  };
+  isLoading: boolean;
+  isRtspLoading: boolean;
   error: string | null;
   onConfigChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: () => Promise<void>;
+  onSubmit: (e: React.FormEvent) => void;
   onSave: () => void;
 }
 
 export const CameraConfig: React.FC<CameraConfigProps> = ({
   config,
+  isLoading,
+  isRtspLoading,
   error,
   onConfigChange,
   onSubmit,
-  onSave,
+  onSave
 }) => {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit();
-  };
-
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden h-[85vh] flex flex-col">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-700">Camera Configuration</h3>
+        <h2 className="text-lg font-semibold text-gray-900">Camera Configuration</h2>
       </div>
-      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
+      
+      {error && (
+        <div className="p-4 bg-red-50 border-b border-red-200">
+          <div className="flex items-start">
+            <ExclamationCircleIcon className="w-5 h-5 text-red-400 mt-0.5 mr-2" />
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={onSubmit} className="p-4 space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Camera Name
@@ -37,14 +54,14 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="name"
             value={config.name}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter camera name"
+            placeholder="My Camera"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
         <div>
           <label htmlFor="ipAddress" className="block text-sm font-medium text-gray-700">
-            IP Address
+            IP Address <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -52,9 +69,9 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="ipAddress"
             value={config.ipAddress}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter IP address"
             required
+            placeholder="192.168.1.100"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
@@ -68,14 +85,14 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="port"
             value={config.port}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter port number"
+            placeholder="554"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-            Username
+            Username <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -83,15 +100,14 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="username"
             value={config.username}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter username"
             required
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
+            Password <span className="text-red-500">*</span>
           </label>
           <input
             type="password"
@@ -99,9 +115,8 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="password"
             value={config.password}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter password"
             required
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
@@ -115,33 +130,41 @@ export const CameraConfig: React.FC<CameraConfigProps> = ({
             name="channel"
             value={config.channel}
             onChange={onConfigChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter channel number"
+            placeholder="0"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>
 
-        {error && (
-          <div className="text-red-600 text-sm">{error}</div>
-        )}
-      </form>
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 pt-4">
           <button
             type="submit"
-            onClick={handleSubmit}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isLoading || isRtspLoading}
+            className={`flex-1 flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              isLoading || isRtspLoading
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }`}
           >
-            Connect
+            {isLoading ? (
+              <Loading size="small" color="white" />
+            ) : (
+              'Connect'
+            )}
           </button>
           <button
             type="button"
             onClick={onSave}
-            className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            disabled={isLoading || isRtspLoading}
+            className={`px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 ${
+              isLoading || isRtspLoading
+                ? 'bg-gray-100 cursor-not-allowed'
+                : 'bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }`}
           >
             Save
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }; 

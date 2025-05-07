@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { SidebarItem } from '@/types';
 
 interface CollapsedSidebarProps {
@@ -7,6 +7,8 @@ interface CollapsedSidebarProps {
 }
 
 const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+
   return (
     <aside className="w-16 bg-white border-r border-gray-200 flex flex-col items-center">
       <div className="p-4">
@@ -20,8 +22,12 @@ const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
       <nav className="flex-1 overflow-y-auto w-full">
         {items.map((item) => (
           <div key={item.name} className="relative py-2 flex justify-center">
-            <a 
-              href={item.href} 
+            <button 
+              onClick={() => {
+                if (item.submenu) {
+                  setOpenSubmenu(openSubmenu === item.name ? null : item.name);
+                }
+              }}
               className={`flex items-center justify-center w-10 h-10 rounded-lg ${
                 activeItem === item.name ? 'bg-gray-100' : 'text-gray-500 hover:bg-gray-50'
               }`}
@@ -30,6 +36,11 @@ const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
                 {item.name === 'App' && (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                {item.name === 'Camera' && (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 )}
                 {item.name === 'Ecommerce' && (
@@ -76,7 +87,7 @@ const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
                   </svg>
                 )}
               </div>
-            </a>
+            </button>
             {item.badge && (
               <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
                 {item.badge}
@@ -85,6 +96,36 @@ const CollapsedSidebar: FC<CollapsedSidebarProps> = ({ items, activeItem }) => {
           </div>
         ))}
       </nav>
+
+      {/* Submenu Popup */}
+      {openSubmenu && (
+        <div className="absolute left-16 top-0 h-full bg-white shadow-lg rounded-r-lg w-48">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-800">
+              {items.find(item => item.name === openSubmenu)?.name}
+            </h3>
+          </div>
+          <div className="p-2">
+            {items
+              .find(item => item.name === openSubmenu)
+              ?.submenu?.map((subItem) => (
+                <button
+                  key={subItem.name}
+                  className={`flex items-center w-full px-4 py-2 rounded-lg ${
+                    activeItem === subItem.name ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center w-5 h-5 mr-3">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span>{subItem.name}</span>
+                </button>
+              ))}
+          </div>
+        </div>
+      )}
     </aside>
   );
 };

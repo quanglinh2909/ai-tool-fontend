@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { CameraConfig } from '../components/CameraConfig';
 import { RtspUrlManager } from '../components/RtspUrlManager';
-import { useCamera, CameraConfig as CameraConfigType } from '../hooks/useCamera';
+import { useCamera, CameraConfig as CameraConfigType, CameraState } from '../hooks/useCamera';
 
 export default function Home() {
   const {
@@ -140,8 +140,8 @@ export default function Home() {
               config={cameraConfig}
               error={cameraState.error}
               onConfigChange={handleInputChange}
-              onSubmit={()=>{
-                setCameraState(prev => ({ ...prev, isPlaying: true }));
+              onSubmit={async () => {
+                await togglePlay();
               }}
               onSave={saveCamera}
             />
