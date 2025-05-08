@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import { SnackbarProvider } from 'notistack'
 import Sidebar from "@/components/left-menu/Sidebar";
 import { SidebarProvider } from "@/hooks/useSidebarState";
 import "@/styles/globals.css";
@@ -30,16 +30,19 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <main className={`${publicSans.variable} ${barlowBold.variable} ${barlowExtraBold.variable}`}>
       <SidebarProvider>
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          {/* <Header /> */}
-          <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
-          <Component {...pageProps} />
+        <SnackbarProvider />
+
+
+        <div className="flex h-screen bg-gray-50">
+          <Sidebar />
+          <div className="flex flex-col flex-1 overflow-hidden">
+            {/* <Header /> */}
+            <div className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4">
+              <Component {...pageProps} />
+            </div>
           </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
     </main>
   );
 }
